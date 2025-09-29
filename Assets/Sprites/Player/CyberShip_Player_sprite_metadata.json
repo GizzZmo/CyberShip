@@ -1,0 +1,12 @@
+{
+    "name": "CyberShip_Player",
+    "dimensions": {
+        "width": 128,
+        "height": 128
+    },
+    "pivot_point": {
+        "x": 0.5,
+        "y": 0.5
+    },
+    "usage_notes": "This sprite represents the player's spaceship in the CyberShip game. It should be placed in Assets/Sprites/Player/ and used with the PlayerController script. The pivot point is centered for rotation and movement."
+}
