@@ -33,6 +33,11 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         nextSpawnTime = Time.time + enemySpawnInterval;
+        
+        // Play main theme music
+        AudioManager audioManager = FindObjectOfType<AudioManager>();
+        if (audioManager != null)
+            audioManager.PlayMainTheme();
     }
     
     void Update()
@@ -80,6 +85,16 @@ public class GameManager : MonoBehaviour
     {
         gameOver = true;
         Debug.Log("Game Over! Final Score: " + score);
+        
+        // Stop main theme and play game over music
+        AudioManager audioManager = FindObjectOfType<AudioManager>();
+        if (audioManager != null)
+        {
+            if (audioManager.mainTheme != null)
+                audioManager.mainTheme.Stop();
+            audioManager.PlayGameOver();
+        }
+        
         // Show game over screen
         Time.timeScale = 0f; // Pause game
     }

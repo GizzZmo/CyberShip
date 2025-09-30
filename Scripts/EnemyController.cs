@@ -47,6 +47,11 @@ public class EnemyController : MonoBehaviour
             // Create enemy projectile
             GameObject projectile = Instantiate(enemyProjectilePrefab, firePoint.position, firePoint.rotation);
             
+            // Enemy shot sound
+            AudioManager audioManager = FindObjectOfType<AudioManager>();
+            if (audioManager != null)
+                audioManager.PlayEnemyShot();
+            
             // You can modify the projectile to move toward the player or just downward
             // For simplicity, we'll make it move downward
             

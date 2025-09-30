@@ -29,6 +29,11 @@ public class Projectile : MonoBehaviour
                 GameManager.Instance.AddScore(scoreValue);
             }
             
+            // Explosion sound when hitting enemy
+            AudioManager audioManager = FindObjectOfType<AudioManager>();
+            if (audioManager != null)
+                audioManager.PlayExplosion();
+            
             // Destroy enemy
             Destroy(other.gameObject);
             // Destroy projectile

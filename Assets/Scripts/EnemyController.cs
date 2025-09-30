@@ -13,8 +13,18 @@ public class EnemyController : MonoBehaviour
     public void TakeDamage(int damage)
     {
         health -= damage;
+        
+        // Hit damage sound
+        AudioManager audioManager = FindObjectOfType<AudioManager>();
+        if (audioManager != null)
+            audioManager.PlayHitDamage();
+        
         if (health <= 0)
         {
+            // Explosion sound
+            if (audioManager != null)
+                audioManager.PlayExplosion();
+            
             Destroy(gameObject);
         }
     }
