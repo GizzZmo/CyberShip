@@ -28,6 +28,12 @@ public class EnemyProjectile : MonoBehaviour
             {
                 GameManager.Instance.PlayerTakeDamage();
             }
+            
+            // Hit damage sound
+            AudioManager audioManager = FindObjectOfType<AudioManager>();
+            if (audioManager != null)
+                audioManager.PlayHitDamage();
+            
             // Destroy projectile
             Destroy(gameObject);
         }

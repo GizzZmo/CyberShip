@@ -20,6 +20,11 @@ public class Projectile : MonoBehaviour
         // Her kan du legge til logikk for kollisjon med fiender
         if (other.CompareTag("Enemy"))
         {
+            // Explosion sound when hitting enemy
+            AudioManager audioManager = FindObjectOfType<AudioManager>();
+            if (audioManager != null)
+                audioManager.PlayExplosion();
+            
             Destroy(other.gameObject); // Ødelegger fienden
             Destroy(gameObject);       // Ødelegger prosjektilen
         }
