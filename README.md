@@ -1,4 +1,9 @@
 # CyberShip
+
+[![CI](https://github.com/GizzZmo/CyberShip/workflows/CI/badge.svg)](https://github.com/GizzZmo/CyberShip/actions/workflows/ci.yml)
+[![Documentation CI](https://github.com/GizzZmo/CyberShip/workflows/Documentation%20CI/badge.svg)](https://github.com/GizzZmo/CyberShip/actions/workflows/documentation.yml)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 Cyberpunk Space Shooter Game
 
 🚀 **Implementation Complete!** The cyberpunk space shooter game logic has been implemented with full C# scripts and asset structure according to the blueprint.
@@ -107,11 +112,15 @@ The asset structure follows cyberpunk aesthetics:
 
 ## 📚 Documentation
 
-- **SETUP_GUIDE.md** - Complete Unity setup instructions
-- **Assets/README.md** - Asset creation guidelines
-- **Assets/Sprites/sprite_list.md** - Required sprite assets
-- **Assets/Sounds/sound_list.md** - Required audio assets
-- **Assets/Fonts/font_list.md** - Required font assets
+- **[SETUP_GUIDE.md](SETUP_GUIDE.md)** - Complete Unity setup instructions
+- **[API_REFERENCE.md](API_REFERENCE.md)** - Detailed API documentation for all scripts
+- **[ARCHITECTURE.md](ARCHITECTURE.md)** - System architecture and design patterns
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contribution guidelines
+- **[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)** - Community code of conduct
+- **[Assets/README.md](Assets/README.md)** - Asset creation guidelines
+- **[Assets/Sprites/sprite_list.md](Assets/Sprites/sprite_list.md)** - Required sprite assets
+- **[Assets/Sounds/sound_list.md](Assets/Sounds/sound_list.md)** - Required audio assets
+- **[Assets/Fonts/font_list.md](Assets/Fonts/font_list.md)** - Required font assets
 
 ---
 
@@ -122,6 +131,31 @@ The asset structure follows cyberpunk aesthetics:
 - Implements proper object lifecycle management
 - Includes singleton pattern for game state
 - Configurable parameters for easy game balancing
+- Comprehensive XML documentation for all C# scripts
+- Automated CI/CD workflows for code quality and documentation validation
+
+---
+
+## 🚀 CI/CD
+
+This project includes automated workflows:
+
+- **CI Workflow**: Validates code quality, file structure, security, and assets
+- **Documentation CI**: Checks markdown files, validates links, and ensures documentation completeness
+
+All workflows run automatically on push and pull requests to main and develop branches.
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details on:
+- Setting up your development environment
+- Coding standards and best practices
+- Submitting pull requests
+- Reporting issues
+
+Please also read our [Code of Conduct](CODE_OF_CONDUCT.md) before contributing.
 
 ---
 

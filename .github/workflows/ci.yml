@@ -1,0 +1,195 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  code-quality:
+    name: Code Quality Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Check C# file structure
+      run: |
+        echo "Checking C# files..."
+        cs_files=$(find . -name "*.cs" -not -path "./Library/*" -not -path "./Temp/*" -not -path "./obj/*" -not -path "./.git/*")
+        
+        if [ -z "$cs_files" ]; then
+          echo "⚠️ No C# files found"
+        else
+          echo "✓ Found C# files:"
+          echo "$cs_files"
+          
+          # Check for basic quality indicators
+          echo ""
+          echo "Checking for XML documentation..."
+          for file in $cs_files; do
+            if grep -q "/// <summary>" "$file"; then
+              echo "✓ $file has XML documentation"
+            else
+              echo "⚠️ $file missing XML documentation"
+            fi
+          done
+        fi
+
+    - name: Check for TODO and FIXME comments
+      run: |
+        echo "Checking for TODO/FIXME comments..."
+        find . -name "*.cs" -not -path "./Library/*" -not -path "./Temp/*" -not -path "./obj/*" -not -path "./.git/*" -exec grep -Hn "TODO\|FIXME" {} \; || echo "No TODOs or FIXMEs found"
+      continue-on-error: true
+
+  file-structure:
+    name: Validate File Structure
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Check project structure
+      run: |
+        echo "Validating project structure..."
+        
+        required_dirs=(
+          "Assets"
+          "Scripts"
+          "Scenes"
+          ".github/workflows"
+        )
+        
+        for dir in "${required_dirs[@]}"; do
+          if [ -d "$dir" ]; then
+            echo "✓ $dir directory exists"
+          else
+            echo "⚠️ $dir directory missing"
+          fi
+        done
+        
+        echo ""
+        echo "Project structure:"
+        tree -L 2 -I 'Library|Temp|obj|.git' || ls -R
+
+    - name: Check for binary files
+      run: |
+        echo "Checking for large binary files..."
+        find . -type f -size +1M -not -path "./Library/*" -not -path "./Temp/*" -not -path "./.git/*" | while read file; do
+          size=$(du -h "$file" | cut -f1)
+          echo "Large file: $file ($size)"
+        done || echo "No large files found"
+
+  security-check:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Check for sensitive data
+      run: |
+        echo "Scanning for potential sensitive data..."
+        
+        # Check for common patterns that might indicate secrets
+        patterns=(
+          "password.*=.*['\"].*['\"]"
+          "apikey.*=.*['\"].*['\"]"
+          "secret.*=.*['\"].*['\"]"
+          "token.*=.*['\"].*['\"]"
+        )
+        
+        found=0
+        for pattern in "${patterns[@]}"; do
+          if grep -r -i -n "$pattern" --include="*.cs" --exclude-dir=".git" . ; then
+            found=1
+          fi
+        done
+        
+        if [ $found -eq 0 ]; then
+          echo "✓ No obvious sensitive data patterns found"
+        else
+          echo "⚠️ Potential sensitive data found - please review"
+        fi
+      continue-on-error: true
+
+  asset-validation:
+    name: Validate Assets
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Check asset organization
+      run: |
+        echo "Checking asset organization..."
+        
+        if [ -d "Assets" ]; then
+          echo "Assets directory structure:"
+          tree Assets -L 2 || ls -R Assets
+          
+          # Check for required asset subdirectories
+          asset_dirs=("Sprites" "Sounds" "Fonts" "Scripts")
+          for dir in "${asset_dirs[@]}"; do
+            if [ -d "Assets/$dir" ]; then
+              echo "✓ Assets/$dir exists"
+            else
+              echo "⚠️ Assets/$dir directory missing"
+            fi
+          done
+        else
+          echo "⚠️ Assets directory not found"
+        fi
+
+    - name: Check for asset documentation
+      run: |
+        echo "Checking for asset documentation..."
+        
+        asset_docs=(
+          "Assets/README.md"
+          "Assets/Sprites/sprite_list.md"
+          "Assets/Sounds/sound_list.md"
+          "Assets/Fonts/font_list.md"
+        )
+        
+        for doc in "${asset_docs[@]}"; do
+          if [ -f "$doc" ]; then
+            echo "✓ $doc exists"
+          else
+            echo "⚠️ $doc missing"
+          fi
+        done
+
+  build-status:
+    name: Build Status Summary
+    runs-on: ubuntu-latest
+    needs: [code-quality, file-structure, security-check, asset-validation]
+    if: always()
+    
+    steps:
+    - name: Check status
+      run: |
+        echo "CI checks completed!"
+        echo ""
+        echo "Build Summary:"
+        echo "- Code Quality: ${{ needs.code-quality.result }}"
+        echo "- File Structure: ${{ needs.file-structure.result }}"
+        echo "- Security Check: ${{ needs.security-check.result }}"
+        echo "- Asset Validation: ${{ needs.asset-validation.result }}"
+        
+        if [ "${{ needs.code-quality.result }}" == "failure" ] || \
+           [ "${{ needs.file-structure.result }}" == "failure" ] || \
+           [ "${{ needs.security-check.result }}" == "failure" ] || \
+           [ "${{ needs.asset-validation.result }}" == "failure" ]; then
+          echo ""
+          echo "❌ Some checks failed"
+          exit 1
+        else
+          echo ""
+          echo "✓ All checks passed!"
+        fi

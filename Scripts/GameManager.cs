@@ -1,21 +1,54 @@
 using UnityEngine;
 
+/// <summary>
+/// Central game manager that controls game state, scoring, lives, and enemy spawning.
+/// Implements singleton pattern for global access throughout the game.
+/// </summary>
 public class GameManager : MonoBehaviour
 {
+    /// <summary>
+    /// Singleton instance of the GameManager accessible from anywhere in the game.
+    /// </summary>
     public static GameManager Instance;
     
     [Header("Game Settings")]
+    /// <summary>
+    /// Number of lives the player has remaining.
+    /// </summary>
     public int playerLives = 3;
+    
+    /// <summary>
+    /// Current player score.
+    /// </summary>
     public int score = 0;
+    
+    /// <summary>
+    /// Indicates whether the game is over.
+    /// </summary>
     public bool gameOver = false;
     
     [Header("Spawn Settings")]
+    /// <summary>
+    /// Prefab for enemies to be spawned.
+    /// </summary>
     public GameObject enemyPrefab;
+    
+    /// <summary>
+    /// Time interval in seconds between enemy spawns.
+    /// </summary>
     public float enemySpawnInterval = 2f;
+    
+    /// <summary>
+    /// Array of transform points where enemies can spawn.
+    /// </summary>
     public Transform[] spawnPoints;
     
     private float nextSpawnTime;
     
+    /// <summary>
+    /// Initializes the singleton instance.
+    /// Ensures only one GameManager exists across scenes.
+    /// </summary>
     void Awake()
     {
         // Singleton pattern
@@ -30,6 +63,9 @@ public class GameManager : MonoBehaviour
         }
     }
     
+    /// <summary>
+    /// Sets up initial spawn timing.
+    /// </summary>
     void Start()
     {
         nextSpawnTime = Time.time + enemySpawnInterval;
@@ -40,6 +76,9 @@ public class GameManager : MonoBehaviour
             audioManager.PlayMainTheme();
     }
     
+    /// <summary>
+    /// Called every frame. Handles enemy spawning when game is active.
+    /// </summary>
     void Update()
     {
         if (!gameOver)
@@ -48,6 +87,9 @@ public class GameManager : MonoBehaviour
         }
     }
     
+    /// <summary>
+    /// Spawns enemies at random spawn points at regular intervals.
+    /// </summary>
     void SpawnEnemies()
     {
         if (Time.time >= nextSpawnTime && enemyPrefab != null && spawnPoints.Length > 0)
@@ -63,6 +105,10 @@ public class GameManager : MonoBehaviour
         }
     }
     
+    /// <summary>
+    /// Adds points to the player's score.
+    /// </summary>
+    /// <param name="points">Number of points to add.</param>
     public void AddScore(int points)
     {
         score += points;
@@ -70,6 +116,9 @@ public class GameManager : MonoBehaviour
         Debug.Log("Score: " + score);
     }
     
+    /// <summary>
+    /// Reduces player lives by one and triggers game over if lives reach zero.
+    /// </summary>
     public void PlayerTakeDamage()
     {
         playerLives--;
@@ -81,6 +130,9 @@ public class GameManager : MonoBehaviour
         Debug.Log("Lives remaining: " + playerLives);
     }
     
+    /// <summary>
+    /// Triggers the game over state and pauses the game.
+    /// </summary>
     public void GameOver()
     {
         gameOver = true;
@@ -99,6 +151,9 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 0f; // Pause game
     }
     
+    /// <summary>
+    /// Restarts the game by resetting score, lives, and game state.
+    /// </summary>
     public void RestartGame()
     {
         gameOver = false;

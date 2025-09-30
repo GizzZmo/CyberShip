@@ -1,15 +1,37 @@
 using UnityEngine;
 
+/// <summary>
+/// Controls enemy AI behavior including movement, shooting, and collision detection.
+/// Enemies move downward and shoot at regular intervals.
+/// </summary>
 public class EnemyController : MonoBehaviour
 {
+    /// <summary>
+    /// Movement speed of the enemy in units per second.
+    /// </summary>
     public float moveSpeed = 2f;
+    
+    /// <summary>
+    /// Time interval in seconds between enemy shots.
+    /// </summary>
     public float shootInterval = 2f;
+    
+    /// <summary>
+    /// Prefab for the enemy projectile to be instantiated when shooting.
+    /// </summary>
     public GameObject enemyProjectilePrefab;
+    
+    /// <summary>
+    /// Transform point where enemy projectiles will spawn from.
+    /// </summary>
     public Transform firePoint;
     
     private float nextShootTime;
     private Transform player;
 
+    /// <summary>
+    /// Initializes the enemy by finding the player and setting up shooting timer.
+    /// </summary>
     void Start()
     {
         // Find the player in the scene
@@ -22,12 +44,18 @@ public class EnemyController : MonoBehaviour
         nextShootTime = Time.time + shootInterval;
     }
 
+    /// <summary>
+    /// Called every frame. Handles movement and shooting behavior.
+    /// </summary>
     void Update()
     {
         Move();
         Shoot();
     }
 
+    /// <summary>
+    /// Moves the enemy downward and destroys it when off-screen.
+    /// </summary>
     void Move()
     {
         // Simple downward movement for space shooter enemies
@@ -40,6 +68,9 @@ public class EnemyController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Shoots enemy projectiles at regular intervals.
+    /// </summary>
     void Shoot()
     {
         if (Time.time >= nextShootTime && enemyProjectilePrefab != null && firePoint != null)
@@ -59,6 +90,10 @@ public class EnemyController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Handles collision with player or player projectiles.
+    /// </summary>
+    /// <param name="other">The collider that the enemy collided with.</param>
     void OnTriggerEnter2D(Collider2D other)
     {
         // If enemy collides with player

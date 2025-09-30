@@ -1,0 +1,143 @@
+name: Documentation CI
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - '**.md'
+      - '.github/workflows/documentation.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - '**.md'
+      - '.github/workflows/documentation.yml'
+
+jobs:
+  lint-markdown:
+    name: Lint Markdown Files
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install markdownlint-cli
+      run: npm install -g markdownlint-cli
+
+    - name: Lint markdown files
+      run: |
+        markdownlint '**/*.md' --ignore node_modules --ignore .git --config .markdownlint.json || true
+      continue-on-error: true
+
+  check-links:
+    name: Check Documentation Links
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Check links in markdown files
+      uses: gaurav-nelson/github-action-markdown-link-check@v1
+      with:
+        use-quiet-mode: 'yes'
+        config-file: '.markdown-link-check.json'
+        check-modified-files-only: 'no'
+      continue-on-error: true
+
+  validate-structure:
+    name: Validate Documentation Structure
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Check required documentation files
+      run: |
+        echo "Checking for required documentation files..."
+        required_files=(
+          "README.md"
+          "CONTRIBUTING.md"
+          "CODE_OF_CONDUCT.md"
+          "SETUP_GUIDE.md"
+          "API_REFERENCE.md"
+          "ARCHITECTURE.md"
+        )
+        
+        missing_files=()
+        for file in "${required_files[@]}"; do
+          if [ ! -f "$file" ]; then
+            missing_files+=("$file")
+          else
+            echo "✓ $file exists"
+          fi
+        done
+        
+        if [ ${#missing_files[@]} -ne 0 ]; then
+          echo ""
+          echo "❌ Missing required documentation files:"
+          printf '%s\n' "${missing_files[@]}"
+          exit 1
+        else
+          echo ""
+          echo "✓ All required documentation files are present"
+        fi
+
+    - name: Validate README structure
+      run: |
+        echo "Validating README.md structure..."
+        if ! grep -q "# CyberShip" README.md; then
+          echo "❌ README.md missing project title"
+          exit 1
+        fi
+        
+        if ! grep -q "## " README.md; then
+          echo "❌ README.md missing sections"
+          exit 1
+        fi
+        
+        echo "✓ README.md structure is valid"
+
+  spell-check:
+    name: Spell Check Documentation
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install aspell
+      run: sudo apt-get update && sudo apt-get install -y aspell aspell-en
+
+    - name: Spell check markdown files
+      run: |
+        echo "Running spell check on markdown files..."
+        find . -name "*.md" -not -path "./node_modules/*" -not -path "./.git/*" | while read file; do
+          echo "Checking $file"
+          # Extract text from markdown and spell check
+          # Using --list mode to only show misspelled words
+          cat "$file" | aspell --lang=en --encoding=utf-8 list | sort -u > /tmp/misspelled.txt || true
+          if [ -s /tmp/misspelled.txt ]; then
+            echo "  Found potential spelling issues (may include technical terms):"
+            cat /tmp/misspelled.txt | head -10
+          fi
+        done
+      continue-on-error: true
+
+  documentation-summary:
+    name: Documentation Summary
+    runs-on: ubuntu-latest
+    needs: [lint-markdown, check-links, validate-structure, spell-check]
+    if: always()
+    
+    steps:
+    - name: Summary
+      run: |
+        echo "Documentation CI checks completed!"
+        echo "Check individual job results above for details."
