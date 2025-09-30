@@ -6,7 +6,8 @@
 
 Cyberpunk Space Shooter Game
 
-🚀 **Implementation Complete!** The cyberpunk space shooter game logic has been implemented with full C# scripts and asset structure according to the blueprint.
+🚀 **Implementation Complete!** 
+The cyberpunk space shooter game logic has been implemented with full C# scripts and asset structure according to the blueprint.
 
 ---
 
